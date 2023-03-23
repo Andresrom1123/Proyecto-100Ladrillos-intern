@@ -1,0 +1,25 @@
+- model: bank_accounts.bankaccount
+  pk: 1
+  fields:
+    debit: 0274764838471045
+    nip: 1923
+- model: bank_accounts.bankaccount
+  pk: 2
+  fields:
+    debit: 3857327576049374
+    nip: 1010
+- model: bank_accounts.bankaccount
+  pk: 3
+  fields:
+    debit: 0374047511133847
+    nip: 9123
+- model: bank_accounts.bankaccount
+  pk: 4
+  fields:
+    debit: 8485406336485035
+    nip: 9384
+- model: bank_accounts.bankaccount
+  pk: 5
+  fields:
+    debit: 1394384893018474
+    nip: 8123
