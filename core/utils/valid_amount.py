@@ -1,4 +1,7 @@
 def valid_amount(amount):
+	if amount == 0:
+		return False
+		
 	if len(str(amount)) >= 2:
 		amount = int(str(amount)[len(str(amount))-2:])
 

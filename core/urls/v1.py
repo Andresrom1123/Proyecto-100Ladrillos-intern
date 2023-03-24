@@ -9,4 +9,6 @@ urlpatterns = [
 	path('locked/<slug:account_id>/', views.LockedBankAccountsView.as_view()),
 	path('deposit/<slug:account_id>/', views.DepositBankAccountsView.as_view()),
 	path('withdraw/<slug:account_id>/', views.WithdrawBankAccountsView.as_view()),
+	path('balance/<slug:account_id>/', views.BalanceBankAccountsView.as_view()),
+	path('transfer/<slug:account_id>/', views.TransferBankAccountsView.as_view()),
 ]

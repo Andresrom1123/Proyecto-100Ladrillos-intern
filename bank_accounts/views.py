@@ -26,11 +26,11 @@ class LoginBankAccountsView(APIView):
 		account = self.get_object(debit)
 
 		if not account:
-			return Response({'error': 'La tarjeta de débito no existe'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({'error': 'Nùmero de tarjeta desconocido.'}, status=status.HTTP_400_BAD_REQUEST)
 		if account.locked:
 			return Response({'error': 'La cuenta ha sido bloqueada por favor intenta con otra'}, status=status.HTTP_400_BAD_REQUEST)
 		if account.nip != nip:
-			return Response({'error': 'El nip es incorrecto'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({'error': 'Número secreto es incorrecto'}, status=status.HTTP_400_BAD_REQUEST)
 
 		return Response(status=status.HTTP_200_OK)
 			
@@ -126,5 +126,75 @@ class WithdrawBankAccountsView(APIView):
 		except:
 			withdraw = request.data.get('withdraw')
 			return Response({'error': f'"{withdraw}" No es una cantidad válida. Por favor vuelve a intentarlo'}, status=status.HTTP_400_BAD_REQUEST)
-		
 
+class BalanceBankAccountsView(APIView):
+	"""
+	Mustra el saldo de una tarjeta
+	"""
+	def get_object(self, account_id):
+		try:
+			return BankAccount.objects.get(id=account_id)
+		except BankAccount.DoesNotExist:
+			return []
+	
+	def post(self, request, account_id, format=None):
+		total_amount = sum([account.amount for account in BankAccount.objects.all()])
+		total_amount_with_percentage = total_amount * 0.80
+
+		total_withdraw = sum([account.withdraw for account in BankAccount.objects.all()])
+
+		valid_withdraw = total_amount_with_percentage - total_withdraw
+		account = self.get_object(account_id)
+
+		if not account:
+			return Response({'error': 'La tarjeta de débito no existe'}, status=status.HTTP_400_BAD_REQUEST)
+		if valid_withdraw > account.amount and valid_amount(account.amount):
+			return Response({'success': f'Su saldo actual es de ${account.amount} y puede retirar todo si lo desea.'}, status=status.HTTP_200_OK)
+		if account.amount == 0:
+			return Response({'success': f'Su saldo actual es de ${account.amount}.'}, status=status.HTTP_200_OK)
+
+		valid_amount_numbers = list(range(0, account.amount-(account.amount - int(valid_withdraw)) + 1))[::-1]
+		valid_amount_number = 0
+		for number in valid_amount_numbers:
+			if valid_amount(number):
+				valid_amount_number = number
+				break
+		return Response({'success': f'Su saldo actual es de ${account.amount} y puede retirar hasta ${valid_amount_number}'}, status=status.HTTP_200_OK)
+
+class TransferBankAccountsView(APIView):
+	"""
+	Hace una nueva transferencia
+	"""
+	def get_object(self, debit):
+		try:
+			return BankAccount.objects.get(debit=debit)
+		except BankAccount.DoesNotExist:
+			return []
+	def post(self, request, account_id, format=None):
+
+		try:
+			debit = request.data.get('debit')
+			amount = float(request.data.get('amount'))
+
+			account_transfer = self.get_object(debit)
+			account = get_object_or_404(BankAccount.objects.all(), pk=account_id)			
+
+			if not account_transfer:
+				return Response({'error': 'La cuenta a la que desea transferir no existe en este banco'}, status=status.HTTP_400_BAD_REQUEST)
+			if account_transfer.locked:
+				return Response({'error': 'La cuenta a la que desea transferir esta bloqueada'}, status=status.HTTP_400_BAD_REQUEST)
+			if amount > account.amount:
+				return Response({'error': f'No cuenta con saldo suficiente, solo puede transferir hasta ${account.amount}'}, status=status.HTTP_400_BAD_REQUEST)
+			if account.debit == debit:
+				return Response({'error': 'No te puedes transferir a ti mismo'}, status=status.HTTP_400_BAD_REQUEST)
+
+			account_transfer.amount += round(amount, 2)
+			account.amount -= amount
+
+			account.save()
+			account_transfer.save()
+
+			return Response({'success': f'Se ha transferido ${round(amount,2)}. Su saldo actual es de ${account.amount}'}, status=status.HTTP_200_OK)
+		except:
+			amount = request.data.get('amount')
+			return Response({'error': f'"{amount}" No es una cantidad válida. Por favor vuelve a intentarlo'}, status=status.HTTP_400_BAD_REQUEST)
