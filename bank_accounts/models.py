@@ -2,9 +2,10 @@ from django.db import models
 
 
 class BankAccount(models.Model):
-	debit = models.IntegerField()
-	nip = models.IntegerField()
+	debit = models.CharField(max_length=16)
+	nip = models.CharField(max_length=16)
 	amount = models.IntegerField(default=0)
+	withdraw = models.IntegerField(default=0)
 	locked = models.BooleanField(default=False)
 
 
