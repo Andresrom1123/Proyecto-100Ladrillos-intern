@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from .models import BankAccount
-from core.utils.valid_amount import valid_amount
+from core.utils.valid_amount import valid_amount, withdraw_amount
 
 
 # Login
@@ -122,7 +122,7 @@ class WithdrawBankAccountsView(APIView):
 			account.amount -= withdraw
 			account.withdraw += withdraw
 			account.save()
-			return Response({'success': f'Se ha retirado ${withdraw} pesos en su cuenta. Su saldo actual es de {account.amount}'}, status=status.HTTP_200_OK)
+			return Response({'success': f'Se han retirado ${withdraw} entregando los siguientes billetes:', 'data': withdraw_amount(withdraw)}, status=status.HTTP_200_OK)
 		except:
 			withdraw = request.data.get('withdraw')
 			return Response({'error': f'"{withdraw}" No es una cantidad válida. Por favor vuelve a intentarlo'}, status=status.HTTP_400_BAD_REQUEST)

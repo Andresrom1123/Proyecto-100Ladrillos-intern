@@ -8,7 +8,7 @@ class TestBankAccount(APITestCase):
 	def setUp(self) -> None:
 		self.url_base = 'http://localhost:8000/api/v1/bank/'
 		self.account_1 = BankAccount.objects.create(debit='0274764838471045', nip='1923', amount=40)
-		self.account_2 = BankAccount.objects.create(debit='3857327576049374', nip='1010', amount=100)
+		self.account_2 = BankAccount.objects.create(debit='3857327576049374', nip='1010', amount=153)
 
 
 	def test_login_bank_account_view(self):
@@ -37,9 +37,10 @@ class TestBankAccount(APITestCase):
 	def test_withdraw_bank_account_view(self):
 		url = f'{self.url_base}withdraw/2/'
 		data = {
-		 'withdraw': 100
+		 'withdraw': 58
 		}
 		response = self.client.post(url, data)
+		print(response.data)
 		self.assertEqual(response.status_code, 200)
 
 	def test_balance_bank_account_view(self):
