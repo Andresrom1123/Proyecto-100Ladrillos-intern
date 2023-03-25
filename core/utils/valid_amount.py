@@ -8,16 +8,16 @@ def valid_amount(amount):
 	if amount % 3 == 0 or amount % 5 == 0:
 		return True
 
-	numbers_are_valid = []
-	for x in range(len(str(amount)) -1 , -1, -1):
+	for x in range(len(str(amount)) -1, -1, -1):
 		number = int(str(amount)[::-1][x]+ '0'*x)
 		number_in_bills = any([number % bill == 0 for bill in bills])
-		if number_in_bills or number == 8:
-			numbers_are_valid.append(True)    
+		
+		if number_in_bills or number == 8:			
 			continue
 		else:
 			return False
-	return False if not all(numbers_are_valid) else True
+
+	return True
 
 def withdraw_amount(amount):
     bills = [200, 100, 50, 10, 5, 3]

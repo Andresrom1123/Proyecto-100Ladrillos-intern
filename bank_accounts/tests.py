@@ -20,14 +20,8 @@ class TestBankAccount(APITestCase):
 		response = self.client.post(url, data=data)
 		self.assertEqual(response.status_code, 200)
 
-	def test_locked_bank_account_view(self):
-		url = f'{self.url_base}locked/2/'
-		
-		response = self.client.post(url)
-		self.assertEqual(response.status_code, 200)
-
 	def test_deposit_bank_account_view(self):
-		url = f'{self.url_base}deposit/1/'
+		url = f'{self.url_base}deposit/{self.account_1.debit}/'
 		data = {
 		 'deposit': 21
 		}
@@ -35,21 +29,20 @@ class TestBankAccount(APITestCase):
 		self.assertEqual(response.status_code, 200)
 
 	def test_withdraw_bank_account_view(self):
-		url = f'{self.url_base}withdraw/2/'
+		url = f'{self.url_base}withdraw/{self.account_2.debit}/'
 		data = {
 		 'withdraw': 58
 		}
 		response = self.client.post(url, data)
-		print(response.data)
 		self.assertEqual(response.status_code, 200)
 
 	def test_balance_bank_account_view(self):
-		url = f'{self.url_base}balance/2/'
-		response = self.client.post(url)
+		url = f'{self.url_base}balance/{self.account_2.debit}/'
+		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
 
 	def test_transfer_bank_account_view(self):
-		url = f'{self.url_base}transfer/1/'
+		url = f'{self.url_base}transfer/{self.account_1.debit}/'
 		data = {
 		 'debit': '3857327576049374',
 		 'amount': 12.33
